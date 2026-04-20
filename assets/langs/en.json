@@ -1,0 +1,12 @@
+{
+  "username": "Username",
+  "password": "Password",
+  "login": "Login",
+  "signUp": "Don't have an account? Sign Up",
+  "doctorLogin": "Login as Doctor",
+  "loginFailed": "Login Failed",
+  "invalidCredentials": "Invalid username or password.",
+  "ok": "OK",
+  "dontHaveAccount": "Don't have an account",
+  "loginAsDoctor": "Login as Doctor"
+}

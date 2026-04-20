@@ -1,0 +1,12 @@
+{
+  "username": "ਉਪਭੋਗਤਾ ਨਾਮ",
+  "password": "ਪਾਸਵਰਡ",
+  "login": "ਲਾਗਿਨ",
+  "signUp": "ਖਾਤਾ ਨਹੀਂ ਹੈ? ਸਾਈਨ ਅਪ ਕਰੋ",
+  "doctorLogin": "ਡਾਕਟਰ ਵਜੋਂ ਲਾਗਿਨ ਕਰੋ",
+  "loginFailed": "ਲਾਗਿਨ ਅਸਫਲ",
+  "invalidCredentials": "ਅਵੈਧ ਉਪਭੋਗਤਾ ਨਾਮ ਜਾਂ ਪਾਸਵਰਡ।",
+  "ok": "ਠੀਕ ਹੈ",
+  "dontHaveAccount": "ਖਾਤਾ ਨਹੀਂ ਹੈ",
+  "loginAsDoctor": "ਡਾਕਟਰ ਵਜੋਂ ਲਾਗਿਨ ਕਰੋ"
+}
