@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../utils/api_config.dart';
 
 class FirstAidScreen extends StatefulWidget {
   const FirstAidScreen({super.key});
@@ -15,8 +17,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
   List<String> steps = [];
   bool isLoading = false;
 
-  final String apiKey = "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";
-  final String apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+  String get apiUrl => "${ApiConfig.baseUrl}/api/ai/chat";
 
   final List<Map<String, dynamic>> categories = [
     {'name': 'Burns', 'icon': Icons.local_fire_department, 'color': Colors.orange},
@@ -50,10 +51,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
-          "Authorization": "Bearer $apiKey",
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://tandurust.app",
-          "X-Title": "Tandurust First Aid"
         },
         body: jsonEncode({
           "model": "openai/gpt-4o-mini",
@@ -131,7 +129,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('First Aid Guide'), backgroundColor: Colors.teal),
+      appBar: AppBar(title: Text('first_aid'.tr()), backgroundColor: Colors.teal),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _callEmergency,
         label: const Text("Call 108"),

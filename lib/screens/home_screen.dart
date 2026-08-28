@@ -1,50 +1,52 @@
 import 'package:flutter/material.dart';
-import 'app_with_voice_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'user_profile_screen.dart';
-import 'social_connection_screen.dart';
 import 'doctor_appointment_screen.dart';
 import 'health_tips_screen.dart';
-import 'news.dart';
 import 'chatbot_screen.dart';
 import 'settings_screen.dart';
 import 'symptom_checker.dart';
 import 'blood_bank_screen.dart';
 import 'GovtSchemesScreen.dart';
-import 'PatientReportsScreen.dart';
-import 'patient_volunteer_screen.dart';
 import 'medicine_info_screen.dart';
 import 'first_aid_ai_screen.dart';
-import 'contacts_screen.dart';
-import 'DoctorRatingScreen.dart';
+import 'referral_tracking_screen.dart';
+import 'patient_ehr_screen.dart';
+import 'teleconsultation_screen.dart';
+import 'opd_queue_screen.dart';
+import 'abdm_health_records_screen.dart';
+import 'notifications_screen.dart';
+import '../widgets/language_picker.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('userName') ?? 'User';
+    });
+  }
 
   final List<Map<String, dynamic>> doctors = [
-    {
-      'name': 'Dr. Ananya Sharma',
-      'specialty': 'Cardiologist',
-      'experience': 8,
-      'status': true,
-    },
-    {
-      'name': 'Dr. Rohan Mehta',
-      'specialty': 'Neurologist',
-      'experience': 12,
-      'status': false,
-    },
-    {
-      'name': 'Dr. Sneha Iyer',
-      'specialty': 'Pediatrician',
-      'experience': 5,
-      'status': true,
-    },
-    {
-      'name': 'Dr. Aditya Rao',
-      'specialty': 'General Physician',
-      'experience': 10,
-      'status': true,
-    },
+    {'name': 'Dr. Ananya Sharma', 'specialty': 'Cardiologist', 'experience': 8, 'status': true},
+    {'name': 'Dr. Rohan Mehta', 'specialty': 'Neurologist', 'experience': 12, 'status': false},
+    {'name': 'Dr. Sneha Iyer', 'specialty': 'Pediatrician', 'experience': 5, 'status': true},
+    {'name': 'Dr. Aditya Rao', 'specialty': 'General Physician', 'experience': 10, 'status': true},
   ];
 
   Widget _buildFeatureItem(
@@ -59,12 +61,7 @@ class HomeScreen extends StatelessWidget {
       title: Text(title,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => GlobalVoiceWrapper(child: page),
-          ),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
       },
     );
   }
@@ -75,11 +72,7 @@ class HomeScreen extends StatelessWidget {
       leading: Icon(icon, color: Colors.teal),
       title: Text(text),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => GlobalVoiceWrapper(child: page)),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
       },
     );
   }
@@ -88,12 +81,11 @@ class HomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
-            'Doctor Availability',
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal),
+            'doctor_availability'.tr(),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal),
           ),
         ),
         const SizedBox(height: 12),
@@ -109,13 +101,10 @@ class HomeScreen extends StatelessWidget {
                 width: 180,
                 margin: const EdgeInsets.only(right: 12),
                 decoration: BoxDecoration(
-                  color: doctor['status']
-                      ? Colors.green.shade100
-                      : Colors.red.shade100,
+                  color: doctor['status'] ? Colors.green.shade100 : Colors.red.shade100,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: doctor['status'] ? Colors.green : Colors.red,
-                      width: 2),
+                      color: doctor['status'] ? Colors.green : Colors.red, width: 2),
                 ),
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -123,15 +112,13 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 25,
-                      backgroundColor:
-                      doctor['status'] ? Colors.green : Colors.red,
+                      backgroundColor: doctor['status'] ? Colors.green : Colors.red,
                       child: const Icon(Icons.person, color: Colors.white),
                     ),
                     const SizedBox(height: 8),
                     Text(doctor['name'],
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14)),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     const SizedBox(height: 4),
                     Text(doctor['specialty'],
                         textAlign: TextAlign.center,
@@ -149,139 +136,149 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlobalVoiceWrapper(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Tandurust"),
-          backgroundColor: Colors.teal,
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.teal),
-                child: Text("Menu",
-                    style: TextStyle(color: Colors.white, fontSize: 22)),
-              ),
-              _buildDrawerItem(context,
-                  icon: Icons.people,
-                  text: 'User Profile',
-                  page: UserProfileScreen()),
-              _buildDrawerItem(context,
-                  icon: Icons.newspaper, text: 'News', page: NewsPage()),
-              _buildDrawerItem(context,
-                  icon: Icons.settings,
-                  text: 'Settings',
-                  page: SettingsScreen()),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('app_name'.tr()),
+        backgroundColor: Colors.teal,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () => LanguagePicker.show(context),
           ),
-        ),
-        body: Stack(
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const NotificationsScreen()));
+            },
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: [
-                _buildDoctorHeatmap(context),
-
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.health_and_safety,
-                  title: 'Symptom Check',
-                  page: SymptomCheckerV2(),
-                  color: Colors.redAccent,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.group,
-                  title: 'Contact',
-                  page: ContactsScreens(),
-                  color: Colors.purple,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.calendar_today,
-                  title: 'Doctor Appointment',
-                  page: DoctorAppointmentScreen(),
-                  color: Colors.orange,
-                ),
-
-                /// ⭐ NEW FEATURE ADDED HERE
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.star_rate,
-                  title: 'Rate Doctor',
-                  page: DoctorRatingScreen(),
-                  color: Colors.amber,
-                ),
-
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.assignment,
-                  title: 'Report',
-                  page: PatientReportsScreen(),
-                  color: Colors.grey,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.lightbulb,
-                  title: 'Health Tips',
-                  page: HealthTipsScreen(),
-                  color: Colors.yellow,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.bloodtype,
-                  title: 'Blood Link',
-                  page: BloodBankScreen(),
-                  color: Colors.red,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.account_balance,
-                  title: 'Government Schemes',
-                  page: GovtSchemesScreen(),
-                  color: Colors.indigo,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.volunteer_activism,
-                  title: 'Community Help',
-                  page: PatientVolunteerScreen(),
-                  color: Colors.pinkAccent,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.local_pharmacy,
-                  title: 'Medicine Info',
-                  page: MedicineAvailabilityScreen(),
-                  color: Colors.deepPurple,
-                ),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.medical_services,
-                  title: 'First Aid',
-                  page: FirstAidScreen(),
-                  color: Colors.blue,
-                ),
-              ],
-            ),
-            Positioned(
-              right: 16,
-              bottom: 16,
-              child: FloatingActionButton(
-                backgroundColor: Colors.teal,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => ChatScreen()),
-                  );
-                },
-                child: const Icon(Icons.chat_bubble_outline),
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.teal),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, size: 35, color: Colors.teal),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(_userName,
+                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
               ),
             ),
+            _buildDrawerItem(context,
+                icon: Icons.people, text: 'user_profile'.tr(), page: UserProfileScreen()),
+            _buildDrawerItem(context,
+                icon: Icons.settings, text: 'settings'.tr(), page: SettingsScreen()),
           ],
         ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              "${'welcome'.tr()}, $_userName",
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+            ),
+          ),
+          _buildDoctorHeatmap(context),
+
+          // === CORE FEATURES (SIH PS 26133) ===
+          _buildFeatureItem(context,
+            icon: Icons.health_and_safety,
+            title: 'symptom_check'.tr(),
+            page: SymptomCheckerV2(),
+            color: Colors.redAccent,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.video_call,
+            title: 'teleconsultation'.tr(),
+            page: TeleconsultationScreen(),
+            color: Colors.teal,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.swap_horiz,
+            title: 'referral_tracking'.tr(),
+            page: ReferralTrackingScreen(),
+            color: Colors.deepOrange,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.folder_shared,
+            title: 'my_health_records'.tr(),
+            page: PatientEHRScreen(),
+            color: Colors.brown,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.credit_card,
+            title: 'abha_health_id'.tr(),
+            page: ABDMHealthRecordsScreen(),
+            color: Colors.blue.shade800,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.queue,
+            title: 'opd_queue'.tr(),
+            page: OPDQueueScreen(),
+            color: Colors.cyan,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.calendar_today,
+            title: 'doctor_appointment'.tr(),
+            page: DoctorAppointmentScreen(),
+            color: Colors.orange,
+          ),
+
+          const Divider(height: 32),
+
+          // === ADDITIONAL FEATURES ===
+          _buildFeatureItem(context,
+            icon: Icons.medical_services,
+            title: 'first_aid'.tr(),
+            page: FirstAidScreen(),
+            color: Colors.blue,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.local_pharmacy,
+            title: 'medicine_info'.tr(),
+            page: MedicineAvailabilityScreen(),
+            color: Colors.deepPurple,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.lightbulb,
+            title: 'health_tips'.tr(),
+            page: HealthTipsScreen(),
+            color: Colors.amber,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.bloodtype,
+            title: 'blood_link'.tr(),
+            page: BloodBankScreen(),
+            color: Colors.red,
+          ),
+          _buildFeatureItem(context,
+            icon: Icons.account_balance,
+            title: 'govt_schemes'.tr(),
+            page: GovtSchemesScreen(),
+            color: Colors.indigo,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.teal,
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen()));
+        },
+        child: const Icon(Icons.chat_bubble_outline),
       ),
     );
   }

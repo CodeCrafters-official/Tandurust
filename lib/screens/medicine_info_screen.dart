@@ -1,5 +1,6 @@
 // file: medicine_availability_screen.dart
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MedicineAvailabilityScreen extends StatefulWidget {
   const MedicineAvailabilityScreen({super.key});
@@ -173,7 +174,7 @@ class _MedicineAvailabilityScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Medicine Info & Availability'),
+        title: Text('medicine_info'.tr()),
         backgroundColor: Colors.teal,
       ),
       body: Padding(

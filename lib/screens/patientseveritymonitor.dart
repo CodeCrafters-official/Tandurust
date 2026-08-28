@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:easy_localization/easy_localization.dart';
+import '../utils/api_config.dart';
 
 class EmergencyPatient {
   String name;
@@ -67,7 +69,7 @@ class _EmergencyTriageBoardScreenState
     ];
 
     final response = await http.post(
-      Uri.parse("http://51.21.128.88/predict"), // use 127.0.0.1 for web
+      Uri.parse("${ApiConfig.baseUrl}/predict"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"features": features}),
     );
@@ -117,7 +119,7 @@ class _EmergencyTriageBoardScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("ER Smart Triage Board"),
+        title: Text('patient_severity_monitor'.tr()),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
@@ -138,21 +140,21 @@ class _EmergencyTriageBoardScreenState
             TextField(
               controller: hrCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Heart Rate"),
+              decoration: InputDecoration(labelText: 'heart_rate'.tr()),
             ),
             TextField(
               controller: sbpCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Systolic BP"),
+              decoration: InputDecoration(labelText: 'blood_pressure'.tr()),
             ),
             TextField(
               controller: spo2Ctrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "SpO₂ (%)"),
+              decoration: InputDecoration(labelText: 'oxygen'.tr()),
             ),
 
             SwitchListTile(
-              title: const Text("Unconscious"),
+              title: Text('unconscious'.tr()),
               value: unconscious,
               onChanged: (v) => setState(() => unconscious = v),
             ),
@@ -171,7 +173,7 @@ class _EmergencyTriageBoardScreenState
             TextField(
               controller: painCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Pain (0–10)"),
+              decoration: InputDecoration(labelText: '${'pain_level'.tr()} (0–10)'),
             ),
 
             const SizedBox(height: 10),

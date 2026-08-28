@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PatientReportsScreen extends StatelessWidget {
   const PatientReportsScreen({super.key});
@@ -41,7 +42,7 @@ class PatientReportsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Reports"),
+        title: Text('report'.tr()),
         backgroundColor: Colors.teal,
       ),
       body: ListView.separated(

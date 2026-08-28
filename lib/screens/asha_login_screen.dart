@@ -1,31 +1,26 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../utils/api_config.dart';
 import '../widgets/language_picker.dart';
-import 'home_screen.dart';
-import 'patientsignup.dart';
-import 'doctor_login_screen.dart';
-import 'loading_screen.dart';
-import 'asha_login_screen.dart';
+import 'asha_worker_dashboard.dart';
+import 'asha_signup_screen.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class AshaLoginScreen extends StatefulWidget {
+  const AshaLoginScreen({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<AshaLoginScreen> createState() => _AshaLoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _AshaLoginScreenState extends State<AshaLoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
 
-  final String baseUrl = ApiConfig.baseUrl;
-
-  void _handleLogin({bool auto = false}) async {
+  void _handleLogin() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -36,70 +31,53 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    // Hardcoded fallback
     final Map<String, String> hardcodedUsers = {
-      "admin": "admin@123",
+      "asha1": "asha@123",
     };
 
     if (hardcodedUsers.containsKey(username) &&
         hardcodedUsers[username] == password) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', username);
-      await prefs.setString('userName', 'Admin');
-      await prefs.setBool('isLoggedIn', true);
-
+      await prefs.setString('ashaName', 'Sunita Pawar');
+      await prefs.setString('userRole', 'asha');
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+        MaterialPageRoute(
+          builder: (_) =>
+              const AshaWorkerDashboard(),
+        ),
       );
       return;
     }
 
+    // Try API login
     try {
       final response = await http.post(
-        Uri.parse("$baseUrl/patients/login"),
+        Uri.parse('${ApiConfig.baseUrl}/asha/login'),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "username": username,
-          "password": password,
-        }),
+        body: jsonEncode({"username": username, "password": password}),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('username', username);
-        await prefs.setString('userName', data['patient']?['name'] ?? username);
-        await prefs.setInt('patientId', data['patient']?['id'] ?? 1);
-        await prefs.setString('userRole', 'patient');
-        await prefs.setString('password', password);
-        await prefs.setBool('isLoggedIn', true);
-
-        Navigator.push(
+        await prefs.setString('ashaName', data['worker']?['name'] ?? username);
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => LoadingScreen(
-                onLoadingComplete: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => HomeScreen()),
-                  );
-                },
-              ),
+            builder: (_) =>
+                const AshaWorkerDashboard(),
           ),
-        );
-      } else if (response.statusCode == 401) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('invalid_credentials'.tr())),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Server error: ${response.statusCode}")),
+          SnackBar(content: Text('invalid_credentials'.tr())),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error connecting to server: $e")),
+        SnackBar(content: Text('invalid_credentials'.tr())),
       );
     }
   }
@@ -108,7 +86,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(""),
+        title: Text('asha_worker_login'.tr()),
+        backgroundColor: Colors.teal,
         actions: [
           IconButton(
             icon: const Icon(Icons.language),
@@ -144,9 +123,9 @@ class _LoginPageState extends State<LoginPage> {
                 labelText: 'password'.tr(),
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureText
-                      ? Icons.visibility_off
-                      : Icons.visibility),
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                  ),
                   onPressed: () {
                     setState(() => _obscureText = !_obscureText);
                   },
@@ -166,28 +145,14 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => SignUpPatientPage()),
+                  MaterialPageRoute(builder: (_) => const AshaSignupScreen()),
                 );
               },
               child: Text('dont_have_account'.tr()),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const DoctorLoginScreen()),
-                );
-              },
-              child: Text('login_as_doctor'.tr()),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AshaLoginScreen()),
-                );
-              },
-              child: Text('login_as_asha'.tr()),
+              onPressed: () => Navigator.pop(context),
+              child: Text('back_to_patient_login'.tr()),
             ),
           ],
         ),

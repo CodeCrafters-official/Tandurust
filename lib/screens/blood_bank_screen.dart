@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class BloodBankScreen extends StatefulWidget {
   const BloodBankScreen({super.key});
@@ -211,7 +212,7 @@ class _BloodBankScreenState extends State<BloodBankScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Digital Blood Bank"),
+        title: Text('blood_bank'.tr()),
         backgroundColor: Colors.teal,
         bottom: TabBar(
           controller: _tabController,

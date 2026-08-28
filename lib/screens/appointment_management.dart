@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AppointmentManagementScreen extends StatefulWidget {
   const AppointmentManagementScreen({super.key});
@@ -66,7 +67,7 @@ class _AppointmentManagementScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Appointment Management"),
+        title: Text('appointment_management'.tr()),
         backgroundColor: Colors.teal,
       ),
       body: ListView.builder(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class GovtSchemesScreen extends StatefulWidget {
   const GovtSchemesScreen({super.key});
@@ -84,7 +85,7 @@ class _GovtSchemesScreenState extends State<GovtSchemesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Health Schemes"),
+        title: Text('govt_schemes'.tr()),
         backgroundColor: Colors.teal,
       ),
       body: Column(

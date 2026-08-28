@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'user_profile_screen.dart';
 import 'chatbot_screen.dart';
 import 'settings_screen.dart';
@@ -6,9 +8,13 @@ import 'appointment_management.dart';
 import 'contacts_screen.dart';
 import 'patientseveritymonitor.dart';
 import 'consultation_history_screen.dart';
-import 'patient_volunteer_screen.dart';
-import 'pandemic_mode_screen.dart'; // 🚨 NEW IMPORT
-import 'app_with_voice_button.dart';
+import 'referral_tracking_screen.dart';
+import 'teleconsultation_screen.dart';
+import 'high_risk_followup_screen.dart';
+import 'facility_dashboard_screen.dart';
+import 'diagnostic_coordination_screen.dart';
+import 'opd_queue_screen.dart';
+import '../widgets/language_picker.dart';
 
 class DoctorHomeScreen extends StatefulWidget {
   const DoctorHomeScreen({super.key});
@@ -18,6 +24,20 @@ class DoctorHomeScreen extends StatefulWidget {
 }
 
 class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
+  String _doctorName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDoctorName();
+  }
+
+  Future<void> _loadDoctorName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _doctorName = prefs.getString('doctorName') ?? 'Doctor';
+    });
+  }
 
   final List<Map<String, String>> todaysAppointments = [
     {'patient': 'Pavithra', 'time': '10:00 AM'},
@@ -30,7 +50,6 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   final int pendingConsultations = 2;
   bool isAvailable = true;
 
-  // 🔹 Feature item builder
   Widget _buildFeatureItem(
       BuildContext context, {
         required IconData icon,
@@ -51,7 +70,6 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     );
   }
 
-  // 🔹 Drawer item
   Widget _buildDrawerItem(BuildContext context,
       {required IconData icon, required String text, required Widget page}) {
     return ListTile(
@@ -63,7 +81,6 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     );
   }
 
-  // 🔹 Dashboard card
   Widget _buildDashboard() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -72,15 +89,13 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-          /// Availability toggle
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Status",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('status'.tr(),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Row(children: [
-                Text(isAvailable ? "Available" : "Busy",
+                Text(isAvailable ? 'available'.tr() : 'busy'.tr(),
                     style: TextStyle(
                         color: isAvailable ? Colors.green : Colors.red,
                         fontWeight: FontWeight.bold)),
@@ -93,8 +108,8 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
           ),
 
           const SizedBox(height: 15),
-          const Text("Today's Appointments",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text('todays_appointments'.tr(),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
 
           ...todaysAppointments.map((a) => ListTile(
             leading: const Icon(Icons.person, color: Colors.teal),
@@ -107,7 +122,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
           Row(children: [
             const Icon(Icons.pending_actions, color: Colors.orange),
             const SizedBox(width: 10),
-            Text("Pending Consultations: $pendingConsultations")
+            Text("${'pending_consultations'.tr()}: $pendingConsultations")
           ])
         ]),
       ),
@@ -116,11 +131,16 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GlobalVoiceWrapper(
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
-          title: const Text("Tandurust Doctor"),
+          title: Text("${'app_name'.tr()} - ${'doctor'.tr()}"),
           backgroundColor: Colors.teal,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.language),
+              onPressed: () => LanguagePicker.show(context),
+            ),
+          ],
           leading: Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu),
@@ -129,88 +149,117 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
           ),
         ),
 
-        /// Drawer
         drawer: Drawer(
           child: ListView(
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.teal),
-                child: Text("Menu",
-                    style: TextStyle(color: Colors.white, fontSize: 22)),
+              DrawerHeader(
+                decoration: const BoxDecoration(color: Colors.teal),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.medical_services, size: 35, color: Colors.teal),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(_doctorName,
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
               ),
               _buildDrawerItem(context,
                   icon: Icons.person,
-                  text: "Profile",
+                  text: 'profile'.tr(),
                   page: UserProfileScreen()),
               _buildDrawerItem(context,
                   icon: Icons.settings,
-                  text: "Settings",
+                  text: 'settings'.tr(),
                   page: SettingsScreen()),
             ],
           ),
         ),
 
-        /// Body
         body: Stack(
           children: [
             ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    "${'welcome'.tr()}, $_doctorName",
+                    style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                  ),
+                ),
 
                 _buildDashboard(),
 
-                _buildFeatureItem(
-                  context,
+                _buildFeatureItem(context,
                   icon: Icons.monitor_heart,
-                  title: "Patient Severity Monitor",
+                  title: 'patient_severity_monitor'.tr(),
                   page: EmergencyTriageBoardScreen(),
                   color: Colors.deepOrange,
                 ),
-
-                _buildFeatureItem(
-                  context,
+                _buildFeatureItem(context,
                   icon: Icons.calendar_month,
-                  title: "Appointment Management",
+                  title: 'appointment_management'.tr(),
                   page: AppointmentManagementScreen(),
                   color: Colors.redAccent,
                 ),
-
-                _buildFeatureItem(
-                  context,
+                _buildFeatureItem(context,
                   icon: Icons.people,
-                  title: "Patient List",
+                  title: 'patient_list'.tr(),
                   page: ContactsScreen(),
                   color: Colors.purple,
                 ),
-
-                _buildFeatureItem(
-                  context,
+                _buildFeatureItem(context,
                   icon: Icons.history,
-                  title: "Consultation History",
+                  title: 'consultation_history'.tr(),
                   page: ConsultationHistoryScreen(),
                   color: Colors.indigo,
                 ),
-
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.volunteer_activism,
-                  title: "Community Help",
-                  page: PatientVolunteerScreen(),
-                  color: Colors.pinkAccent,
+                _buildFeatureItem(context,
+                  icon: Icons.video_call,
+                  title: 'teleconsultation'.tr(),
+                  page: TeleconsultationScreen(),
+                  color: Colors.teal.shade700,
                 ),
-
-                /// 🚨 NEW PANDEMIC PAGE
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.coronavirus,
-                  title: "Pandemic Emergency Mode",
-                  page: PandemicModeScreen(),
-                  color: Colors.red,
+                _buildFeatureItem(context,
+                  icon: Icons.swap_horiz,
+                  title: 'referral_tracking'.tr(),
+                  page: ReferralTrackingScreen(),
+                  color: Colors.deepOrange,
+                ),
+                _buildFeatureItem(context,
+                  icon: Icons.pregnant_woman,
+                  title: 'high_risk_followup'.tr(),
+                  page: HighRiskFollowUpScreen(),
+                  color: Colors.red.shade700,
+                ),
+                _buildFeatureItem(context,
+                  icon: Icons.dashboard,
+                  title: 'facility_dashboard'.tr(),
+                  page: FacilityDashboardScreen(),
+                  color: Colors.blueGrey,
+                ),
+                _buildFeatureItem(context,
+                  icon: Icons.science,
+                  title: 'lab_diagnostics'.tr(),
+                  page: DiagnosticCoordinationScreen(),
+                  color: Colors.lime.shade800,
+                ),
+                _buildFeatureItem(context,
+                  icon: Icons.queue,
+                  title: 'opd_queue'.tr(),
+                  page: OPDQueueScreen(),
+                  color: Colors.cyan,
                 ),
               ],
             ),
 
-            /// Chatbot FAB
             Positioned(
               right: 16,
               bottom: 16,
@@ -227,7 +276,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 }
+

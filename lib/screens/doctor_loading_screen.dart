@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'doctor_home_screen.dart'; // Make sure to import your home screen
-import 'app_with_voice_button.dart'; // Import your GlobalVoiceWrapper
+import 'doctor_home_screen.dart';
 
 class DoctorLoadingScreen extends StatefulWidget {
   @override
@@ -25,7 +24,6 @@ class _LoadingScreenState extends State<DoctorLoadingScreen> {
           _loadingProgress++;
         } else {
           _timer.cancel();
-          // After loading is complete, navigate to the home screen
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => DoctorHomeScreen()),
           );
@@ -42,48 +40,45 @@ class _LoadingScreenState extends State<DoctorLoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GlobalVoiceWrapper( // Wrap screen to add mic button
-      child: Scaffold(
-        backgroundColor: const Color(0xFFB3E5FC), // Lighter blue color
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo in the center
-              Container(
-                width: 600, // Adjust size as needed
-                height: 600,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/logo.png'), // Ensure your logo is correctly placed in assets
-                    fit: BoxFit.contain,
-                  ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFB3E5FC),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 600,
+              height: 600,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/logo.png'),
+                  fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 1),
-              const Text(
-                'Your Life, Our Priority!',
-                style: TextStyle(
-                  fontSize: 25,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            const SizedBox(height: 1),
+            const Text(
+              'Your Life, Our Priority!',
+              style: TextStyle(
+                fontSize: 25,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 30),
-              CircularProgressIndicator(
-                value: _loadingProgress / 100,
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+            const SizedBox(height: 30),
+            CircularProgressIndicator(
+              value: _loadingProgress / 100,
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Loading: $_loadingProgress%',
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 16,
               ),
-              const SizedBox(height: 20),
-              Text(
-                'Loading: $_loadingProgress%',
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

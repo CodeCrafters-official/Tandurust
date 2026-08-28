@@ -1,6 +1,7 @@
 // lib/screens/symptom_checker_v2.dart
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 /// AI-like offline symptom checker (heuristic)
 /// NOT a medical diagnosis — only a decision support / triage helper.
@@ -268,7 +269,7 @@ class _SymptomCheckerV2State extends State<SymptomCheckerV2> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Symptom Checker'),
+        title: Text('symptom_check'.tr()),
         backgroundColor: Colors.teal,
       ),
       body: SafeArea(

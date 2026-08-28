@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../utils/api_config.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -14,9 +16,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
-  /// 🔐 PUT YOUR OPENROUTER KEY HERE (locally only)
-  final String apiKey = "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";
-  final String apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+  String get apiUrl => "${ApiConfig.baseUrl}/api/ai/chat";
 
   late stt.SpeechToText _speech;
   bool _isListening = false;
@@ -50,10 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
-          "Authorization": "Bearer $apiKey",
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://radha.app",
-          "X-Title": "RADHA Assistant"
         },
         body: jsonEncode({
           "model": "openai/gpt-4o-mini",
@@ -154,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("RADHA Assistant")),
+      appBar: AppBar(title: Text('chatbot'.tr())),
       body: Column(
         children: [
           Expanded(
@@ -173,7 +170,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: TextField(
                     controller: _controller,
                     decoration:
-                    InputDecoration(hintText: "Ask me anything..."),
+                    InputDecoration(hintText: 'ask_health_question'.tr()),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),

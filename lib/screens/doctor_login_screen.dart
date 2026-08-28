@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'doctor_loading_screen.dart'; // Doctor-specific loading screen
-import 'app_with_voice_button.dart'; // Import your GlobalVoiceWrapper
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../utils/api_config.dart';
+import '../widgets/language_picker.dart';
+import 'doctor_loading_screen.dart';
+import 'doctor_signup_screen.dart';
 
 class DoctorLoginScreen extends StatefulWidget {
   const DoctorLoginScreen({super.key});
@@ -46,45 +50,24 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
     }
   }
 
-  void _changeLanguage(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Select Language'.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text("English"),
-              onTap: () {
-                context.setLocale(const Locale('en'));
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text("हिंदी"),
-              onTap: () {
-                context.setLocale(const Locale('hi'));
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text("ਪੰਜਾਬੀ"),
-              onTap: () {
-                context.setLocale(const Locale('pa'));
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  void _changeLanguage(BuildContext context) {
+    LanguagePicker.show(context);
   }
 
   void _handleLogin({bool auto = false}) async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
+    if (username.isEmpty || password.isEmpty) {
+      if (!auto) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('enter_all_fields'.tr())),
+        );
+      }
+      return;
+    }
+
+    // Check hardcoded credentials first
     final matched = _doctorCredentials.any(
           (cred) => cred['username'] == username && cred['password'] == password,
     );
@@ -94,23 +77,54 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
       await prefs.setBool('isDoctorLoggedIn', true);
       await prefs.setString('doctorUsername', username);
       await prefs.setString('doctorPassword', password);
+      await prefs.setString('doctorName', 'Dr. Default');
 
-      // Navigate to Doctor Loading Screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => DoctorLoadingScreen()),
       );
-    } else if (!auto) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("invalidCredentials".tr())),
+      return;
+    }
+
+    // Try API login
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/doctors/login'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"username": username, "password": password}),
       );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isDoctorLoggedIn', true);
+        await prefs.setString('doctorUsername', username);
+        await prefs.setString('doctorPassword', password);
+        await prefs.setString('doctorName', data['doctor']?['name'] ?? username);
+        await prefs.setInt('doctorId', data['doctor']?['id'] ?? 1);
+        await prefs.setString('userRole', 'doctor');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => DoctorLoadingScreen()),
+        );
+      } else if (!auto) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('invalid_credentials'.tr())),
+        );
+      }
+    } catch (e) {
+      if (!auto) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('invalid_credentials'.tr())),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return GlobalVoiceWrapper( // Wrap screen to add mic button
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           actions: [
             IconButton(
@@ -164,10 +178,19 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                   child: Text('login'.tr()),
                 ),
               ),
+              const SizedBox(height: 15),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const DoctorSignupScreen()),
+                  );
+                },
+                child: Text('dont_have_account'.tr()),
+              ),
             ],
           ),
         ),
-      ),
     );
   }
 }

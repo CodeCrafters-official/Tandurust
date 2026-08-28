@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:easy_localization/easy_localization.dart';
+import '../utils/api_config.dart';
 
 class SignUpPatientPage extends StatefulWidget {
   @override
@@ -45,7 +47,7 @@ class _SignUpPatientPageState extends State<SignUpPatientPage> {
       "address": encryptedAddress,
     };
 
-    var url = Uri.parse("https://ddc84add1485.ngrok-free.app/patients/signup"); // Replace with Ngrok URL if testing on phone
+    var url = Uri.parse("${ApiConfig.baseUrl}/patients/register");
     var response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -54,13 +56,13 @@ class _SignUpPatientPageState extends State<SignUpPatientPage> {
 
     if (response.statusCode == 201) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Patient signup successful!")),
+        SnackBar(content: Text('registration_successful'.tr())),
       );
       _formKey.currentState!.reset();
     } else {
       var error = jsonDecode(response.body)['error'];
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Signup failed: $error")),
+        SnackBar(content: Text("${'registration_failed'.tr()}: $error")),
       );
     }
   }
@@ -85,45 +87,47 @@ class _SignUpPatientPageState extends State<SignUpPatientPage> {
                 children: [
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: "Username",
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'username'.tr(),
+                      border: const OutlineInputBorder(),
                     ),
-                    validator: (value) => value!.isEmpty ? "Enter name" : null,
+                    validator: (value) => value!.isEmpty ? 'enter_all_fields'.tr() : null,
                   ),
                   const SizedBox(height: 15),
                   TextFormField(
                     controller: _ageController,
-                    decoration: const InputDecoration(
-                      labelText: "Age",
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'Age',
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
-                    validator: (value) => value!.isEmpty ? "Enter age" : null,
+                    validator: (value) => value!.isEmpty ? 'enter_all_fields'.tr() : null,
                   ),
                   const SizedBox(height: 15),
                   TextFormField(
                     controller: _genderController,
-                    decoration: const InputDecoration(
-                      labelText: "Gender",
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'Gender',
+                      border: const OutlineInputBorder(),
                     ),
-                    validator: (value) => value!.isEmpty ? "Enter gender" : null,
+                    validator: (value) => value!.isEmpty ? 'enter_all_fields'.tr() : null,
                   ),
                   const SizedBox(height: 15),
                   TextFormField(
                     controller: _phoneController,
-                    decoration: const InputDecoration(
-                      labelText: "Password",
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'password'.tr(),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 15),
                   TextFormField(
                     controller: _addressController,
-                    decoration: const InputDecoration(
-                      labelText: "Address",
-                      border: OutlineInputBorder(),
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => signupPatient(),
+                    decoration: InputDecoration(
+                      labelText: 'village'.tr(),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -131,13 +135,13 @@ class _SignUpPatientPageState extends State<SignUpPatientPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: signupPatient,
-                      child: const Text("Sign Up"),
+                      child: Text('signup'.tr()),
                     ),
                   ),
                   const SizedBox(height: 15),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text("Already have an account? Login"),
+                    child: Text('already_have_account'.tr()),
                   ),
                 ],
               ),

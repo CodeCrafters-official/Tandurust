@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ConsultationHistoryScreen extends StatefulWidget {
   const ConsultationHistoryScreen({super.key});
@@ -94,7 +95,7 @@ class _ConsultationHistoryScreenState extends State<ConsultationHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Consultation History"),
+        title: Text('consultation_history'.tr()),
         backgroundColor: Colors.teal,
       ),
       body: Padding(

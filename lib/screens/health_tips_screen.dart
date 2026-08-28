@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:easy_localization/easy_localization.dart';
+import '../utils/api_config.dart';
 
 class HealthTipsScreen extends StatefulWidget {
   @override
@@ -21,9 +23,7 @@ class _HealthTipsScreenState extends State<HealthTipsScreen> {
 
   final TextEditingController _controller = TextEditingController();
 
-  /// 🔐 PASTE YOUR NEW OPENROUTER KEY HERE
-  final String apiKey = "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";
-  final String apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+  String get apiUrl => "${ApiConfig.baseUrl}/api/ai/chat";
 
   @override
   void initState() {
@@ -51,10 +51,7 @@ class _HealthTipsScreenState extends State<HealthTipsScreen> {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
-          "Authorization": "Bearer $apiKey",
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://tandurust.app",
-          "X-Title": "Tandurust Health App"
         },
         body: jsonEncode({
           "model": "openai/gpt-4o-mini",
@@ -142,7 +139,7 @@ class _HealthTipsScreenState extends State<HealthTipsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Health Tips")),
+      appBar: AppBar(title: Text('health_tips'.tr())),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
