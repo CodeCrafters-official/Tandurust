@@ -2,10 +2,9 @@ flask
 flask_sqlalchemy
 flask_cors
 flask_socketio
-psycopg2-binary
 werkzeug
 numpy<2
 python-dotenv
-eventlet
 gunicorn
 requests
+psycopg2-binary

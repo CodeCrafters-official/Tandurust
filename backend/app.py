@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date
 from dotenv import load_dotenv
 import numpy as np
+import requests as req_lib
 import os
 import json
 
@@ -1292,7 +1293,6 @@ def seed_visits():
 
 
 # ================= AI PROXY (keeps API key server-side) =================
-import requests as req_lib
 
 OPENROUTER_KEY = os.getenv('OPENROUTER_API_KEY', '')
 
